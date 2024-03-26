@@ -1157,6 +1157,74 @@ ClaimNonReceiptRejectReason1Choice:
       xml:
         name: Prtry
   description: Specifies the rejection reason of a claim non receipt.
+ClaimNonReceiptV07:
+  required:
+    - assgnmt
+    - undrlyg
+  type: object
+  properties:
+    assgnmt:
+      $ref: '#/CaseAssignment5'
+    get_case:
+      $ref: '#/Case5'
+    undrlyg:
+      $ref: '#/UnderlyingTransaction5Choice'
+    coverDtls:
+      $ref: '#/MissingCover4'
+    instrForAssgne:
+      $ref: '#/InstructionForAssignee1'
+    splmtryData:
+      type: array
+      xml:
+        name: SplmtryData
+      items:
+        $ref: '#/SupplementaryData1'
+    case:
+      $ref: '#/Case5'
+  description: "Scope\r\nThe ClaimNonReceipt message is sent by a case creator/case assigner\
+        \ to a case assignee.\r\nThis message is used to initiate an investigation for missing\
+        \ funds at the creditor (missing credit entry to its account) or at an agent along the\
+        \ processing chain (missing cover for a received payment instruction).\r\nUsage\r\nThe\
+        \ claim non receipt case occurs in two situations: \r\n- The creditor is expecting funds\
+        \ from a particular debtor and cannot find the corresponding credit entry on its account.\
+        \ In this situation, it is understood that the creditor will contact its debtor, and that\
+        \ the debtor will trigger the claim non receipt case on its behalf. A workflow where the\
+        \ creditor directly addresses a ClaimNonReceipt message to its account servicing institution\
+        \ is not retained;\r\n- An agent in the processing chain cannot find a cover payment\
+        \ corresponding to a received payment instruction. In this situation, the agent may directly\
+        \ trigger the investigation by sending a ClaimNonReceipt message to the sender of the original\
+        \ payment instruction.\r\nThe ClaimNonReceipt message covers one and only one payment\
+        \ instruction at a time. If several expected payment instructions/cover instructions are found\
+        \ missing, then multiple ClaimNonReceipt messages must be sent.\r\nDepending on the result of\
+        \ the investigation by a case assignee (incorrect routing, errors/omissions when processing\
+        \ the instruction or even the absence of an error) and the stage at which the payment\
+        \ instruction is being process, the claim non receipt case may lead to \
+        \ a: \r\n- CustomerPaymentCancellationRequest or FIToFIPaymentCancellationRequest message,\
+        \ sent to the subsequent agent in the payment processing chain, if the original payment\
+        \ instruction has been incorrectly routed through the chain of agents. (This also implies\
+        \ that a new, corrected, payment instruction is issued);\r\n- RequestToModifyPayment message\
+        \ , sent to the subsequent agent in the payment processing chain, if a truncation or omission\
+        \ has occurred during the processing of the original payment instruction.\r\nIf the above\
+        \ situations occur, the assignee wanting to request a payment cancellation or payment\
+        \ modification should first send out a ResolutionOfInvestigation with a confirmation status\
+        \ that indicates that either cancellation (CWFW) modification (MWFW) or unable to apply\
+        \ (UWFW) will follow. (See section on ResolutionOfInvestigation for more details).\r\nIn the\
+        \ cover is missing, the case assignee may also simply issue the omitted cover payment or when\
+        \ the initial cover information was incorrect, update the cover (through modification and/or\
+        \ cancellation as required) with the correction information provided in the ClaimNonReceipt\
+        \ message. The case assignee will issue a ResolutionOfInvestigation message with the\
+        \ CorrectionTransaction element mentioning the references of the cover payment.\r\nThe\
+        \ ClaimNonReceipt message may be forwarded to subsequent case assignees.\r\nThe ClaimNonReceipt\
+        \ message has the following main characteristics: \r\n- Case identification: The case creator\
+        \ assigns a unique case identification. This information will be passed unchanged to\
+        \ subsequent case assignee(s);\r\n- Underlying payment: The case creator refers to the\
+        \ underlying payment instruction for the unambiguous identification of the payment instruction.\
+        \ This identification needs to be updated by the subsequent case assigner(s) in order to match\
+        \ the one used with their case assignee(s);\r\n- Missing cover indicator: The\
+        \ MissingCoverIndicator element distinguishes between a missing cover situation (when set\
+        \ to YES - true) or a missing funds situation (when set to NO - false);\r\n- CoverCorrection:\
+        \ The CoverCorrection element allows the case assigner to provide corrected cover information,\
+        \ when these are incorrect in the underlying payment instruction for which the cover is issued."
 ClearingSystemIdentification2Choice:
   type: object
   properties:
@@ -3393,6 +3461,22 @@ ImpliedCurrencyAmountRange1Choice:
     neqamt:
       type: number
   description: Choice between ranges of values in which an amount is considered valid or a specified amount value which has to be matched or unmatched to be valid.
+InstructionForAssignee1:
+  type: object
+  properties:
+    cd:
+      maxLength: 4
+      minLength: 1
+      type: string
+      xml:
+        name: Cd
+    instrInf:
+      maxLength: 140
+      minLength: 1
+      type: string
+      xml:
+        name: InstrInf
+  description: Further information related to the processing of the investigation that may need to be acted upon by the assignee.
 InstructionForCreditorAgent1:
   type: object
   properties:
@@ -3538,21 +3622,6 @@ LocalInstrument2Choice:
       xml:
         name: Prtry
   description: Set of elements that further identifies the type of local instruments being requested by the initiating party.
-LocalTime:
-  type: object
-  properties:
-    hour:
-      type: integer
-      format: int32
-    minute:
-      type: integer
-      format: int32
-    second:
-      type: integer
-      format: int32
-    nano:
-      type: integer
-      format: int32
 MandateRelatedInformation14:
   type: object
   properties:
@@ -3631,6 +3700,18 @@ MessageIdentification2:
       xml:
         name: MsgId
   description: Set of elements providing the identification of a message.
+MissingCover4:
+  required:
+    - mssngCoverInd
+  type: object
+  properties:
+    mssngCoverInd:
+      type: boolean
+      xml:
+        name: MssngCoverInd
+    coverCrrctn:
+      $ref: '#/SettlementInstruction6'
+  description: Provides additional cover details for the claim non receipt.
 ModificationStatusReason1Choice:
   type: object
   properties:
@@ -6337,6 +6418,183 @@ ReportingSource1Choice:
       xml:
         name: Prtry
   description: Specifies the source used to generate the reporting.
+RequestedModification8:
+  type: object
+  properties:
+    instrId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: InstrId
+    endToEndId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: EndToEndId
+    txId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: TxId
+    pmtTpInf:
+      $ref: '#/PaymentTypeInformation27'
+    reqdExctnDt:
+      $ref: '#/DateAndDateTime2Choice'
+    reqdColltnDt:
+      type: string
+      format: date
+      xml:
+        name: ReqdColltnDt
+    intrBkSttlmDt:
+      type: string
+      format: date
+      xml:
+        name: IntrBkSttlmDt
+    sttlmTmIndctn:
+      $ref: '#/SettlementDateTimeIndication1'
+    amt:
+      $ref: '#/AmountType4Choice'
+    intrBkSttlmAmt:
+      $ref: '#/ActiveOrHistoricCurrencyAndAmount'
+    chrgBr:
+      type: string
+      description: Specifies which party(ies) will pay charges due for processing of the instruction.
+      xml:
+        name: ChrgBr
+      enum:
+        - DEBT
+        - CRED
+        - SHAR
+        - SLEV
+    ultmtDbtr:
+      $ref: '#/PartyIdentification135'
+    dbtr:
+      $ref: '#/PartyIdentification135'
+    dbtrAcct:
+      $ref: '#/CashAccount38'
+    dbtrAgtAcct:
+      $ref: '#/CashAccount38'
+    sttlmInf:
+      $ref: '#/SettlementInstruction6'
+    cdtrAgtAcct:
+      $ref: '#/CashAccount38'
+    cdtr:
+      $ref: '#/PartyIdentification135'
+    cdtrAcct:
+      $ref: '#/CashAccount38'
+    ultmtCdtr:
+      $ref: '#/PartyIdentification135'
+    purp:
+      $ref: '#/Purpose2Choice'
+    instrForDbtrAgt:
+      maxLength: 140
+      minLength: 1
+      type: string
+      xml:
+        name: InstrForDbtrAgt
+    instrForNxtAgt:
+      type: array
+      xml:
+        name: InstrForNxtAgt
+      items:
+        $ref: '#/InstructionForNextAgent1'
+    instrForCdtrAgt:
+      type: array
+      xml:
+        name: InstrForCdtrAgt
+      items:
+        $ref: '#/InstructionForCreditorAgent1'
+    rmtInf:
+      $ref: '#/RemittanceInformation16'
+  description: Provide further details on the requested modifications of the underlying payment instruction.
+RequestToModifyPaymentV06:
+  required:
+    - assgnmt
+    - mod
+    - undrlyg
+  type: object
+  properties:
+    assgnmt:
+      $ref: '#/CaseAssignment5'
+    get_case:
+      $ref: '#/Case5'
+    undrlyg:
+      $ref: '#/UnderlyingTransaction5Choice'
+    mod:
+      $ref: '#/RequestedModification8'
+    instrForAssgne:
+      $ref: '#/InstructionForAssignee1'
+    splmtryData:
+      type: array
+      xml:
+        name: SplmtryData
+      items:
+        $ref: '#/SupplementaryData1'
+    case:
+      $ref: '#/Case5'
+  description: "Scope\r\nThe RequestToModifyPayment message is sent by a case creator/case assigner\
+        \ to a case assignee.\r\nThis message is used to request the modification of characteristics\
+        \ of an original payment instruction.\r\nUsage\r\nThe RequestToModifyPayment message must be \
+        \ answered with a:\r\n- ResolutionOfInvestigation message with a positive final outcome when \
+        \ the case assignee can perform the requested modification;\r\n- ResolutionOfInvestigation \
+        \ message with a negative final outcome when the case assignee may perform the requested\
+        \ modification but fails to do so (too late, irrevocable instruction, one requested element\
+        \ cannot be modified);\r\n- RejectCaseAssignment message when the case assignee is unable or\
+        \ not authorised to perform the requested modification;\r\n- NotificationOfCaseAssignment\
+        \ message to indicate whether the case assignee will take on the case himself or reassign the\
+        \ case to a subsequent party in the payment processing chain.\r\nThe RequestToModifyPayment\
+        \ message covers one and only one original instruction at a time. If several original payment\
+        \ instructions need to be modified, then multiple RequestToModifyPayment messages must be\
+        \ sent.\r\nThe RequestToModifyPayment message can be sent to request the modification of one\
+        \ or several elements of the original payment instruction. If many elements need to be\
+        \ modified, it is recommended to cancel the original payment instruction and initiate a new\
+        \ one.\r\nThe RequestToModifyPayment must be processed on an all or nothing basis. If one of\
+        \ the elements to be modified cannot be altered, the assignment must be rejected in full by\
+        \ means of a negative ResolutionOfInvestigation message. (See section on\
+        \ ResolutionOfInvestigation for more details).\r\nThe RequestToModifyPayment message must\
+        \ never be sent to request the modification of the currency of the original payment\
+        \ instruction. If the currency is wrong, use a CustomerPaymentCancellationRequest or a\
+        \ FIToFIPaymentCancellationRequest message to cancel it and issue and a new payment\
+        \ instruction.\r\nThe RequestToModifyPayment message may be forwarded to subsequent case\
+        \ assignee(s).\r\nWhen a RequestToModifyPayment message is used to decrease the amount of\
+        \ the original payment instruction, the modification will trigger a return of funds from\
+        \ the case assignee to the case creator. The assignee may indicate, within the\
+        \ ResolutionOfInvestigation message, the amount to be returned, the date it is or will be\
+        \ returned and the channel through which the return will be done.\r\nThe RequestToModifyPayment\
+        \ message must never be sent to request the increase of the amount of the original payment\
+        \ instruction. To increase the amount in a payment, the debtor can do one of the\
+        \ following:\r\n- Cancel the first payment using a CustomerPaymentCancellationRequest or a\
+        \ FIToFIPaymentCancellationRequest message and make a new payment with a higher and correct\
+        \ amount;\r\n- Simply send a second payment with the supplementary amount.\r\nDepending on\
+        \ the requested modification(s) and the processing stage of the original payment\
+        \ instruction, the processing of a request to modify payment case may end with one of the\
+        \ following:\r\n- an AdditionalPaymentInformation message sent to the creditor of the original\
+        \ payment instruction;\r\n- a DebitAuthorisationRequest message sent to the creditor of the\
+        \ original payment instruction;\r\n- a CustomerPaymentCancellationRequest or a\
+        \ FIToFIPaymentCancellationRequest message sent to a subsequent case assignee.\r\nThe\
+        \ RequestToModifyPayment message can be sent to correct characteristics of an original\
+        \ payment instruction following receipt of an UnableToApply message. In this scenario, the\
+        \ case identification will remain the same.\r\nThe RequestToModifyPayment message has the\
+        \ following main characteristics:\r\nThe case creator assigns a unique case\
+        \ identification. This information will be passed unchanged to all subsequent case\
+        \ assignee(s).\r\nLowering the amount of an original payment instruction for which cover\
+        \ is provided by a separate instruction will systematically mean the modification of the\
+        \ whole transaction, including the cover. The case assignee performing the amount modification\
+        \ must initiate the return of funds in excess to the case creator.\r\nThe modification of the\
+        \ agent's or agents' information on an original payment instruction for which cover is provided\
+        \ by a separate instruction will systematically mean the whole transaction is modified, that is\
+        \ the cover is executed through the agent(s) mentioned in the RequestToModifyPayment message.\
+        \ The cover payment must not be modified separately.\r\nThe modification of a payment instruction\
+        \ can be initiated by either the debtor or any subsequent agent in the payment processing chain.\
+        \ \r\nThe case creator provides the information to be modified in line with agreements made with\
+        \ the case assignee. If the case assignee needs in turn to assign the case to a subsequent case\
+        \ assignee, the requested modification(s) must be in line with the agreement made with the next\
+        \ case assignee and a NotificationOfCaseAssignment message must be sent to the case assigner.\
+        \ Otherwise, the request to modify payment case must be rejected (by means of a negative \
+        \ ResolutionOfInvestigation message)."
 ResolutionData1:
   type: object
   properties:
@@ -6600,6 +6858,18 @@ SettlementDateTimeIndication1:
       xml:
         name: CdtDtTm
   description: Information on the occurred settlement time(s) of the payment transaction.
+SettlementInstruction6:
+  type: object
+  properties:
+    instgRmbrsmntAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    instgRmbrsmntAgtAcct:
+      $ref: '#/CashAccount38'
+    instdRmbrsmntAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    instdRmbrsmntAgtAcct:
+      $ref: '#/CashAccount38'
+  description: Provides further details on the settlement of the instruction.
 SettlementInstruction7:
   required:
     - sttlmMtd
@@ -6636,463 +6906,29 @@ SettlementTimeRequest2:
   type: object
   properties:
     tillTm:
-      type: object
-      properties:
-        offset:
-          type: object
-          properties:
-            totalSeconds:
-              type: integer
-              format: int32
-            id:
-              type: string
-            rules:
-              type: object
-              properties:
-                fixedOffset:
-                  type: boolean
-                transitions:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      duration:
-                        type: object
-                        properties:
-                          seconds:
-                            type: integer
-                            format: int64
-                          nano:
-                            type: integer
-                            format: int32
-                          units:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                dateBased:
-                                  type: boolean
-                                timeBased:
-                                  type: boolean
-                                durationEstimated:
-                                  type: boolean
-                          zero:
-                            type: boolean
-                          negative:
-                            type: boolean
-                      gap:
-                        type: boolean
-                      dateTimeBefore:
-                        type: string
-                        format: date-time
-                      dateTimeAfter:
-                        type: string
-                        format: date-time
-                      instant:
-                        type: string
-                        format: date-time
-                      overlap:
-                        type: boolean
-                transitionRules:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      month:
-                        type: string
-                        enum:
-                          - JANUARY
-                          - FEBRUARY
-                          - MARCH
-                          - APRIL
-                          - MAY
-                          - JUNE
-                          - JULY
-                          - AUGUST
-                          - SEPTEMBER
-                          - OCTOBER
-                          - NOVEMBER
-                          - DECEMBER
-                      timeDefinition:
-                        type: string
-                        enum:
-                          - UTC
-                          - WALL
-                          - STANDARD
-                      dayOfWeek:
-                        type: string
-                        enum:
-                          - MONDAY
-                          - TUESDAY
-                          - WEDNESDAY
-                          - THURSDAY
-                          - FRIDAY
-                          - SATURDAY
-                          - SUNDAY
-                      dayOfMonthIndicator:
-                        type: integer
-                        format: int32
-                      localTime:
-                        $ref: '#/LocalTime'
-                      midnightEndOfDay:
-                        type: boolean
-        nano:
-          type: integer
-          format: int32
-        hour:
-          type: integer
-          format: int32
-        minute:
-          type: integer
-          format: int32
-        second:
-          type: integer
-          format: int32
+      type: string
+      format: offset-time
+      example: 10:15:30+01:00
       xml:
         name: TillTm
     frTm:
-      type: object
-      properties:
-        offset:
-          type: object
-          properties:
-            totalSeconds:
-              type: integer
-              format: int32
-            id:
-              type: string
-            rules:
-              type: object
-              properties:
-                fixedOffset:
-                  type: boolean
-                transitions:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      duration:
-                        type: object
-                        properties:
-                          seconds:
-                            type: integer
-                            format: int64
-                          nano:
-                            type: integer
-                            format: int32
-                          units:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                dateBased:
-                                  type: boolean
-                                timeBased:
-                                  type: boolean
-                                durationEstimated:
-                                  type: boolean
-                          zero:
-                            type: boolean
-                          negative:
-                            type: boolean
-                      gap:
-                        type: boolean
-                      dateTimeBefore:
-                        type: string
-                        format: date-time
-                      dateTimeAfter:
-                        type: string
-                        format: date-time
-                      instant:
-                        type: string
-                        format: date-time
-                      overlap:
-                        type: boolean
-                transitionRules:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      month:
-                        type: string
-                        enum:
-                          - JANUARY
-                          - FEBRUARY
-                          - MARCH
-                          - APRIL
-                          - MAY
-                          - JUNE
-                          - JULY
-                          - AUGUST
-                          - SEPTEMBER
-                          - OCTOBER
-                          - NOVEMBER
-                          - DECEMBER
-                      timeDefinition:
-                        type: string
-                        enum:
-                          - UTC
-                          - WALL
-                          - STANDARD
-                      dayOfWeek:
-                        type: string
-                        enum:
-                          - MONDAY
-                          - TUESDAY
-                          - WEDNESDAY
-                          - THURSDAY
-                          - FRIDAY
-                          - SATURDAY
-                          - SUNDAY
-                      dayOfMonthIndicator:
-                        type: integer
-                        format: int32
-                      localTime:
-                        $ref: '#/LocalTime'
-                      midnightEndOfDay:
-                        type: boolean
-        nano:
-          type: integer
-          format: int32
-        hour:
-          type: integer
-          format: int32
-        minute:
-          type: integer
-          format: int32
-        second:
-          type: integer
-          format: int32
+      type: string
+      format: offset-time
+      example: 10:15:30+01:00
       xml:
         name: FrTm
     rjctTm:
-      type: object
-      properties:
-        offset:
-          type: object
-          properties:
-            totalSeconds:
-              type: integer
-              format: int32
-            id:
-              type: string
-            rules:
-              type: object
-              properties:
-                fixedOffset:
-                  type: boolean
-                transitions:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      duration:
-                        type: object
-                        properties:
-                          seconds:
-                            type: integer
-                            format: int64
-                          nano:
-                            type: integer
-                            format: int32
-                          units:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                dateBased:
-                                  type: boolean
-                                timeBased:
-                                  type: boolean
-                                durationEstimated:
-                                  type: boolean
-                          zero:
-                            type: boolean
-                          negative:
-                            type: boolean
-                      gap:
-                        type: boolean
-                      dateTimeBefore:
-                        type: string
-                        format: date-time
-                      dateTimeAfter:
-                        type: string
-                        format: date-time
-                      instant:
-                        type: string
-                        format: date-time
-                      overlap:
-                        type: boolean
-                transitionRules:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      month:
-                        type: string
-                        enum:
-                          - JANUARY
-                          - FEBRUARY
-                          - MARCH
-                          - APRIL
-                          - MAY
-                          - JUNE
-                          - JULY
-                          - AUGUST
-                          - SEPTEMBER
-                          - OCTOBER
-                          - NOVEMBER
-                          - DECEMBER
-                      timeDefinition:
-                        type: string
-                        enum:
-                          - UTC
-                          - WALL
-                          - STANDARD
-                      dayOfWeek:
-                        type: string
-                        enum:
-                          - MONDAY
-                          - TUESDAY
-                          - WEDNESDAY
-                          - THURSDAY
-                          - FRIDAY
-                          - SATURDAY
-                          - SUNDAY
-                      dayOfMonthIndicator:
-                        type: integer
-                        format: int32
-                      localTime:
-                        $ref: '#/LocalTime'
-                      midnightEndOfDay:
-                        type: boolean
-        nano:
-          type: integer
-          format: int32
-        hour:
-          type: integer
-          format: int32
-        minute:
-          type: integer
-          format: int32
-        second:
-          type: integer
-          format: int32
+      type: string
+      format: offset-time
+      example: 10:15:30+01:00
       xml:
         name: RjctTm
-    clstm:
-      type: object
-      properties:
-        offset:
-          type: object
-          properties:
-            totalSeconds:
-              type: integer
-              format: int32
-            id:
-              type: string
-            rules:
-              type: object
-              properties:
-                fixedOffset:
-                  type: boolean
-                transitions:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      duration:
-                        type: object
-                        properties:
-                          seconds:
-                            type: integer
-                            format: int64
-                          nano:
-                            type: integer
-                            format: int32
-                          units:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                dateBased:
-                                  type: boolean
-                                timeBased:
-                                  type: boolean
-                                durationEstimated:
-                                  type: boolean
-                          zero:
-                            type: boolean
-                          negative:
-                            type: boolean
-                      gap:
-                        type: boolean
-                      dateTimeBefore:
-                        type: string
-                        format: date-time
-                      dateTimeAfter:
-                        type: string
-                        format: date-time
-                      instant:
-                        type: string
-                        format: date-time
-                      overlap:
-                        type: boolean
-                transitionRules:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      month:
-                        type: string
-                        enum:
-                          - JANUARY
-                          - FEBRUARY
-                          - MARCH
-                          - APRIL
-                          - MAY
-                          - JUNE
-                          - JULY
-                          - AUGUST
-                          - SEPTEMBER
-                          - OCTOBER
-                          - NOVEMBER
-                          - DECEMBER
-                      timeDefinition:
-                        type: string
-                        enum:
-                          - UTC
-                          - WALL
-                          - STANDARD
-                      dayOfWeek:
-                        type: string
-                        enum:
-                          - MONDAY
-                          - TUESDAY
-                          - WEDNESDAY
-                          - THURSDAY
-                          - FRIDAY
-                          - SATURDAY
-                          - SUNDAY
-                      dayOfMonthIndicator:
-                        type: integer
-                        format: int32
-                      localTime:
-                        $ref: '#/LocalTime'
-                      midnightEndOfDay:
-                        type: boolean
-        nano:
-          type: integer
-          format: int32
-        hour:
-          type: integer
-          format: int32
-        minute:
-          type: integer
-          format: int32
-        second:
-          type: integer
-          format: int32
+    clsTm:
+      type: string
+      format: offset-time
+      example: 10:15:30+01:00
+      xml:
+        name: CLSTm
   description: Provides information on the requested settlement time(s) of the payment instruction.
 StatementResolutionEntry4:
   type: object
@@ -7277,7 +7113,7 @@ SupplementaryDataEnvelope1:
   type: object
   properties:
     any:
-      type: object
+      $ref: '#/AnyDataType'
   description: Technical component that contains the validated supplementary data information. This technical envelope allows to segregate the supplementary data information from any other information.
 TaxAmount2:
   type: object
@@ -8202,6 +8038,152 @@ TransactionParties7:
     ultmtCdtr:
       $ref: '#/Party40Choice'
   description: Provides further details on the parties specific to the individual transaction.
+UnderlyingGroupInformation1:
+  required:
+    - orgnlMsgId
+    - orgnlMsgNmId
+  type: object
+  properties:
+    orgnlMsgId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlMsgId
+    orgnlMsgNmId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlMsgNmId
+    orgnlCreDtTm:
+      type: string
+      format: date-time
+      xml:
+        name: OrgnlCreDtTm
+    orgnlMsgDlvryChanl:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlMsgDlvryChanl
+  description: Unique identification, as assigned by the first instructing agent, to unambiguously identify the group of transactions.
+UnderlyingPaymentInstruction5:
+  required:
+    - orgnlInstdAmt
+  type: object
+  properties:
+    orgnlGrpInf:
+      $ref: '#/UnderlyingGroupInformation1'
+    orgnlPmtInfId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlPmtInfId
+    orgnlInstrId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlInstrId
+    orgnlEndToEndId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlEndToEndId
+    orgnlUETR:
+      pattern: '[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}'
+      type: string
+      xml:
+        name: OrgnlUETR
+    orgnlInstdAmt:
+      $ref: '#/ActiveOrHistoricCurrencyAndAmount'
+    reqdExctnDt:
+      $ref: '#/DateAndDateTime2Choice'
+    reqdColltnDt:
+      type: string
+      format: date
+      xml:
+        name: ReqdColltnDt
+    orgnlTxRef:
+      $ref: '#/OriginalTransactionReference28'
+  description: Provides further details on the original payment initiation, to which the investigation message refers.
+UnderlyingPaymentTransaction4:
+  required:
+    - orgnlIntrBkSttlmAmt
+    - orgnlIntrBkSttlmDt
+  type: object
+  properties:
+    orgnlGrpInf:
+      $ref: '#/UnderlyingGroupInformation1'
+    orgnlInstrId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlInstrId
+    orgnlEndToEndId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlEndToEndId
+    orgnlTxId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlTxId
+    orgnlUETR:
+      pattern: '[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}'
+      type: string
+      xml:
+        name: orgnlUETR
+    orgnlIntrBkSttlmAmt:
+      $ref: '#/ActiveOrHistoricCurrencyAndAmount'
+    orgnlIntrBkSttlmDt:
+      type: string
+      format: date
+      xml:
+        name: OrgnlIntrBkSttlmDt
+    orgnlTxRef:
+      $ref: '#/OriginalTransactionReference28'
+  description: Provides further details on the original payment transaction, to which the investigation message refers.
+UnderlyingStatementEntry3:
+  type: object
+  properties:
+    orgnlGrpInf:
+      $ref: '#/OriginalGroupInformation29'
+    orgnlStmtId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlStmtId
+    orgnlNtryId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlNtryId
+    orgnlUETR:
+      pattern: '[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}'
+      type: string
+      xml:
+        name: orgnlUETR
+  description: Provides further details on the underlying statement entry, to which the investigation message refers.
+UnderlyingTransaction5Choice:
+  type: object
+  properties:
+    initn:
+      $ref: '#/UnderlyingPaymentInstruction5'
+    intrBk:
+      $ref: '#/UnderlyingPaymentTransaction4'
+    stmtNtry:
+      $ref: '#/UnderlyingStatementEntry3'
+  description: Provides details of the underlying transaction, on which the investigation is processed.
 UnderlyingTransaction22:
   type: object
   properties:
@@ -8249,3 +8231,14 @@ YieldedOrValueType1Choice:
         - PREM
         - PARV
   description: Choice of value type.
+
+AnyDataType:
+  oneOf:
+    - type: object
+    - type: string
+    - type: number
+    - type: boolean
+    - type: array
+      items: {}
+  additionalProperties: true
+  description: A schema definition to support any OpenAPI data type
