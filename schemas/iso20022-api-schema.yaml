@@ -306,6 +306,16 @@ AmountAndDirection35:
         - CRDT
         - DBIT
   description: Resulting debit or credit amount of the netted amounts for all debit and credit entries.
+AmountOrRate1Choice:
+  type: object
+  properties:
+    amt:
+      $ref: '#/ActiveCurrencyAndAmount'
+    rate:
+      type: number
+      xml:
+        name: Rate
+  description: Choice between an amount or a rate.
 AmountRangeBoundary1:
   required:
     - bdryAmt
@@ -331,6 +341,54 @@ AmountType4Choice:
     eqvtAmt:
       $ref: '#/EquivalentAmount2'
   description: Specifies the amount of money to be moved between the debtor and creditor, before deduction of charges, expressed in the currency as ordered by the initiating party.
+Attr:
+  type: object
+  properties:
+    schemaTypeInfo:
+      $ref: '#/TypeInfo'
+    specified:
+      type: boolean
+    ownerElement:
+      $ref: '#/Element'
+    id:
+      type: boolean
+    name:
+      type: string
+    value:
+      type: string
+    nodeType:
+      type: integer
+      format: int32
+    nodeName:
+      type: string
+    nodeValue:
+      type: string
+    parentNode:
+      $ref: '#/Node'
+    firstChild:
+      $ref: '#/Node'
+    lastChild:
+      $ref: '#/Node'
+    previousSibling:
+      $ref: '#/Node'
+    nextSibling:
+      $ref: '#/Node'
+    ownerDocument:
+      $ref: '#/Document'
+    baseURI:
+      type: string
+    textContent:
+      type: string
+    namespaceURI:
+      type: string
+    localName:
+      type: string
+    attributes:
+      $ref: '#/NamedNodeMap'
+    childNodes:
+      $ref: '#/NodeList'
+    prefix:
+      type: string
 Authorisation1Choice:
   type: object
   properties:
@@ -1533,6 +1591,52 @@ CorrectiveTransaction4Choice:
     intrBk:
       $ref: '#/CorrectiveInterbankTransaction2'
   description: Specifies the corrective transaction on which the investigation is processed.
+CreditorPaymentActivationRequestStatusReportV07:
+  required:
+    - grpHdr
+    - orgnlGrpInfAndSts
+  type: object
+  properties:
+    grpHdr:
+      $ref: '#/GroupHeader87'
+    orgnlGrpInfAndSts:
+      $ref: '#/OriginalGroupInformation30'
+    orgnlPmtInfAndSts:
+      type: array
+      xml:
+        name: OrgnlGrpInfAndSts
+      items:
+        $ref: '#/OriginalPaymentInstruction31'
+    splmtryData:
+      type: array
+      xml:
+        name: SplmtryData
+      items:
+        $ref: '#/SupplementaryData1'
+  description: The CreditorPaymentActivationRequestStatusReport message is sent by a party to the next party in the creditor payment activation request chain. It is used to inform the latter about the positive or negative status of a creditor payment activation request (either single or file).
+CreditorPaymentActivationRequestV07:
+  required:
+    - grpHdr
+    - pmtInf
+  type: object
+  properties:
+    grpHdr:
+      $ref: '#/GroupHeader78'
+    pmtInf:
+      maxItems: 2147483647
+      minItems: 1
+      type: array
+      xml:
+        name: PmtInf
+      items:
+        $ref: '#/PaymentInstruction31'
+    splmtryData:
+      type: array
+      xml:
+        name: SplmtryData
+      items:
+        $ref: '#/SupplementaryData1'
+  description: "The CreditorPaymentActivationRequest message is sent by the Creditor sending party to the Debtor receiving party, directly or through agents. It is used by a Creditor to request movement of funds from the debtor account to a creditor."
 CreditorReferenceInformation2:
   type: object
   properties:
@@ -1672,6 +1776,92 @@ CreditTransferTransaction34:
       items:
         $ref: '#/SupplementaryData1'
   description: Provide further details specific to the individual transaction(s) included in the message.
+CreditTransferTransaction35:
+  required:
+    - amt
+    - cdtr
+    - cdtrAgt
+    - chrgBr
+    - pmtId
+  type: object
+  properties:
+    pmtId:
+      $ref: '#/PaymentIdentification6'
+    pmtTpInf:
+      $ref: '#/PaymentTypeInformation26'
+    pmtCond:
+      $ref: '#/PaymentCondition1'
+    amt:
+      $ref: '#/AmountType4Choice'
+    chrgBr:
+      type: string
+      description: Specifies which party(ies) will pay charges due for processing of the instruction.
+      xml:
+        name: ChrgBr
+      enum:
+        - DEBT
+        - CRED
+        - SHAR
+        - SLEV
+    chqInstr:
+      $ref: '#/Cheque11'
+    ultmtDbtr:
+      $ref: '#/PartyIdentification135'
+    intrmyAgt1:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    intrmyAgt2:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    intrmyAgt3:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    cdtrAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    cdtr:
+      $ref: '#/PartyIdentification135'
+    cdtrAcct:
+      $ref: '#/CashAccount38'
+    ultmtCdtr:
+      $ref: '#/PartyIdentification135'
+    instrForCdtrAgt:
+      type: array
+      xml:
+        name: InstrForCdtrAgt
+      items:
+        $ref: '#/InstructionForCreditorAgent1'
+    purp:
+      $ref: '#/Purpose2Choice'
+    rgltryRptg:
+      maxItems: 10
+      minItems: 0
+      type: array
+      xml:
+        name: RgltryRptg
+      items:
+        $ref: '#/RegulatoryReporting3'
+    tax:
+      $ref: '#/TaxInformation8'
+    rltdRmtInf:
+      maxItems: 10
+      minItems: 0
+      type: array
+      xml:
+        name: RltdRmtInf
+      items:
+        $ref: '#/RemittanceLocation7'
+    rmtInf:
+      $ref: '#/RemittanceInformation16'
+    nclsdFile:
+      type: array
+      xml:
+        name: NclsdFile
+      items:
+        $ref: '#/Document12'
+    splmtryData:
+      type: array
+      xml:
+        name: SplmtryData
+      items:
+        $ref: '#/SupplementaryData1'
+  description: Provides further details specific to the individual transaction(s) included in the message.
 CreditTransferTransaction36:
   required:
     - cdtr
@@ -2243,6 +2433,151 @@ DateTimePeriod1:
       xml:
         name: ToDtTm
   description: Time span defined by a start date and time, and an end date and time.
+DirectDebitTransaction10:
+  type: object
+  properties:
+    mndtRltdInf:
+      $ref: '#/MandateRelatedInformation14'
+    cdtrSchmeId:
+      $ref: '#/PartyIdentification135'
+    preNtfctnId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: PreNtfctnId
+    preNtfctnDt:
+      type: string
+      format: date
+      xml:
+        name: PreNtfctnDt
+  description: Provides further specific details on the direct debit transaction and the related mandate.
+DirectDebitTransactionInformation24:
+  required:
+    - cdtr
+    - cdtrAgt
+    - chrgBr
+    - dbtr
+    - dbtrAcct
+    - dbtrAgt
+    - intrBkSttlmAmt
+    - pmtId
+  type: object
+  properties:
+    pmtId:
+      $ref: '#/PaymentIdentification7'
+    pmtTpInf:
+      $ref: '#/PaymentTypeInformation27'
+    intrBkSttlmAmt:
+      $ref: '#/ActiveCurrencyAndAmount'
+    intrBkSttlmDt:
+      type: string
+      format: date
+      xml:
+        name: IntrBkSttlmDt
+    sttlmPrty:
+      type: string
+      description: Specifies the priority level of an event.
+      xml:
+        name: SttlmPrty
+      enum:
+        - URGT
+        - HIGH
+        - NORM
+    sttlmTmIndctn:
+      $ref: '#/SettlementDateTimeIndication1'
+    instdAmt:
+      $ref: '#/ActiveOrHistoricCurrencyAndAmount'
+    xchgRate:
+      type: number
+      xml:
+        name: XchgRate
+    chrgBr:
+      type: string
+      description: Specifies which party(ies) will pay charges due for processing of the instruction.
+      xml:
+        name: ChrgBr
+      enum:
+        - DEBT
+        - CRED
+        - SHAR
+        - SLEV
+    chrgsInf:
+      type: array
+      items:
+        $ref: '#/Charges7'
+    reqdColltnDt:
+      type: string
+      format: date
+      xml:
+        name: ReqdColltnDt
+    drctDbtTx:
+      $ref: '#/DirectDebitTransaction10'
+    cdtr:
+      $ref: '#/PartyIdentification135'
+    cdtrAcct:
+      $ref: '#/CashAccount38'
+    cdtrAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    cdtrAgtAcct:
+      $ref: '#/CashAccount38'
+    ultmtCdtr:
+      $ref: '#/PartyIdentification135'
+    initgPty:
+      $ref: '#/PartyIdentification135'
+    instgAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    instdAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    intrmyAgt1:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    intrmyAgt1Acct:
+      $ref: '#/CashAccount38'
+    intrmyAgt2:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    intrmyAgt2Acct:
+      $ref: '#/CashAccount38'
+    intrmyAgt3:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    intrmyAgt3Acct:
+      $ref: '#/CashAccount38'
+    dbtr:
+      $ref: '#/PartyIdentification135'
+    dbtrAcct:
+      $ref: '#/CashAccount38'
+    dbtrAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    dbtrAgtAcct:
+      $ref: '#/CashAccount38'
+    ultmtDbtr:
+      $ref: '#/PartyIdentification135'
+    purp:
+      $ref: '#/Purpose2Choice'
+    rgltryRptg:
+      maxItems: 10
+      minItems: 0
+      type: array
+      xml:
+        name: RgltryRptg
+      items:
+        $ref: '#/RegulatoryReporting3'
+    rltdRmtInf:
+      maxItems: 10
+      minItems: 0
+      type: array
+      xml:
+        name: RltdRmtInf
+      items:
+        $ref: '#/RemittanceLocation7'
+    rmtInf:
+      $ref: '#/RemittanceInformation16'
+    splmtryData:
+      type: array
+      xml:
+        name: SplmtryData
+      items:
+        $ref: '#/SupplementaryData1'
+  description: Provides further details specific to the individual direct debit transaction(s) included in the message.
 DiscountAmountAndType1:
   required:
     - amt
@@ -2295,6 +2630,109 @@ DisplayCapabilities1:
       xml:
         name: LineWidth
   description: The capabilities of the display components performing the transaction.
+Document:
+  type: object
+  properties:
+    doctype:
+      $ref: '#/DocumentType'
+    inputEncoding:
+      type: string
+    xmlEncoding:
+      type: string
+    xmlStandalone:
+      type: boolean
+    xmlVersion:
+      type: string
+    strictErrorChecking:
+      type: boolean
+    documentURI:
+      type: string
+    domConfig:
+      $ref: '#/DOMConfiguration'
+    documentElement:
+      $ref: '#/Element'
+    implementation:
+      $ref: '#/DOMImplementation'
+    nodeType:
+      type: integer
+      format: int32
+    nodeName:
+      type: string
+    nodeValue:
+      type: string
+    parentNode:
+      $ref: '#/Node'
+    firstChild:
+      $ref: '#/Node'
+    lastChild:
+      $ref: '#/Node'
+    previousSibling:
+      $ref: '#/Node'
+    nextSibling:
+      $ref: '#/Node'
+    ownerDocument:
+      $ref: '#/Document'
+    baseURI:
+      type: string
+    textContent:
+      type: string
+    namespaceURI:
+      type: string
+    localName:
+      type: string
+    attributes:
+      $ref: '#/NamedNodeMap'
+    childNodes:
+      $ref: '#/NodeList'
+    prefix:
+      type: string
+Document12:
+  required:
+    - frmt
+    - id
+    - isseDt
+    - nclsr
+    - tp
+  type: object
+  properties:
+    tp:
+      $ref: '#/DocumentType1Choice'
+    id:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: Id
+    isseDt:
+      $ref: '#/DateAndDateTime2Choice'
+    nm:
+      maxLength: 140
+      minLength: 1
+      type: string
+      xml:
+        name: Nm
+    langCd:
+      type: string
+      xml:
+        name: LangCd
+    frmt:
+      $ref: '#/DocumentFormat1Choice'
+    fileNm:
+      maxLength: 140
+      minLength: 1
+      type: string
+      xml:
+        name: FileNm
+    dgtlSgntr:
+      $ref: '#/PartyAndSignature3'
+    nclsr:
+      maxLength: 10485760
+      minLength: 1
+      type: string
+      format: byte
+      xml:
+        name: Nclsr
+  description: Information about a document.
 DocumentAdjustment1:
   required:
     - amt
@@ -2323,6 +2761,17 @@ DocumentAdjustment1:
       xml:
         name: AddtlInf
   description: Set of elements used to provide information on the amount and reason of the document adjustment.
+DocumentFormat1Choice:
+  type: object
+  properties:
+    cd:
+      maxLength: 4
+      minLength: 1
+      type: string
+      xml:
+        name: Cd
+    prtry:
+      $ref: '#/GenericIdentification1'
 DocumentLineIdentification1:
   type: object
   properties:
@@ -2392,6 +2841,121 @@ DocumentLineType1Choice:
       xml:
         name: Prtry
   description: Specifies the type of the document line identification.
+DocumentType:
+  type: object
+  properties:
+    entities:
+      $ref: '#/NamedNodeMap'
+    notations:
+      $ref: '#/NamedNodeMap'
+    internalSubset:
+      type: string
+    publicId:
+      type: string
+    systemId:
+      type: string
+    name:
+      type: string
+    nodeType:
+      type: integer
+      format: int32
+    nodeName:
+      type: string
+    nodeValue:
+      type: string
+    parentNode:
+      $ref: '#/Node'
+    firstChild:
+      $ref: '#/Node'
+    lastChild:
+      $ref: '#/Node'
+    previousSibling:
+      $ref: '#/Node'
+    nextSibling:
+      $ref: '#/Node'
+    ownerDocument:
+      $ref: '#/Document'
+    baseURI:
+      type: string
+    textContent:
+      type: string
+    namespaceURI:
+      type: string
+    localName:
+      type: string
+    attributes:
+      $ref: '#/NamedNodeMap'
+    childNodes:
+      $ref: '#/NodeList'
+    prefix:
+      type: string
+DocumentType1Choice:
+  type: object
+  properties:
+    cd:
+      maxLength: 4
+      minLength: 1
+      type: string
+      xml:
+        name: Cd
+    prtry:
+      $ref: '#/GenericIdentification1'
+  description: Choice of format for the document type.
+Element:
+  type: object
+  properties:
+    tagName:
+      type: string
+    attributeNode:
+      $ref: '#/Attr'
+    attributeNodeNS:
+      $ref: '#/Attr'
+    schemaTypeInfo:
+      $ref: '#/TypeInfo'
+    nodeType:
+      type: integer
+      format: int32
+    nodeName:
+      type: string
+    nodeValue:
+      type: string
+    parentNode:
+      $ref: '#/Node'
+    firstChild:
+      $ref: '#/Node'
+    lastChild:
+      $ref: '#/Node'
+    previousSibling:
+      $ref: '#/Node'
+    nextSibling:
+      $ref: '#/Node'
+    ownerDocument:
+      $ref: '#/Document'
+    baseURI:
+      type: string
+    textContent:
+      type: string
+    namespaceURI:
+      type: string
+    localName:
+      type: string
+    attributes:
+      $ref: '#/NamedNodeMap'
+    childNodes:
+      $ref: '#/NodeList'
+    prefix:
+      type: string
+DOMConfiguration:
+  type: object
+  properties:
+    parameterNames:
+      $ref: '#/DOMStringList'
+DOMStringList:
+  type: object
+  properties:
+    length:
+      type: integer
+      format: int32
 EntryDetails11:
   type: object
   properties:
@@ -2693,6 +3257,29 @@ FIToFICustomerCreditTransferV08:
         \ in the payment chain, then the payment method is called the Serial method.\r\
         \nThe FIToFICustomerCreditTransfer message can be used in domestic and cross-border\
         \ scenarios."
+FIToFICustomerDirectDebitV08:
+  required:
+    - drctDbtTxInf
+    - grpHdr
+  type: object
+  properties:
+    grpHdr:
+      $ref: '#/GroupHeader94'
+    drctDbtTxInf:
+      maxItems: 2147483647
+      minItems: 1
+      type: array
+      xml:
+        name: DrctDbtTxInf
+      items:
+        $ref: '#/DirectDebitTransactionInformation24'
+    splmtryData:
+      type: array
+      xml:
+        name: SplmtryData
+      items:
+        $ref: '#/SupplementaryData1'
+  description: "Scope\r\nThe FinancialInstitutionToFinancialInstitutionCustomerDirectDebit message is sent by the creditor agent to the debtor agent, directly or through other agents and/or a payment clearing and settlement system.\r\nIt is used to collect funds from a debtor account for a creditor.\r\nUsage\r\nThe FItoFICustomerDirectDebit message can contain one or more customer direct debit instructions.\r\nThe FIToFICustomerDirectDebit message does not allow for grouping.\r\nThe FItoFICustomerDirectDebit message may or may not contain mandate related information, that is extracts from a mandate, such as the MandateIdentification or DateOfSignature. The FIToFICustomerDirectDebit message must not be considered as a mandate.\r\nThe FItoFICustomerDirectDebit message can be used in domestic and cross-border scenarios."
 FIToFIPaymentCancellationRequestV08:
   required:
     - assgnmt
@@ -2784,6 +3371,28 @@ FIToFIPaymentCancellationRequestV08:
         \ the cover separately.\r\nCancellation request initiators:\nThe cancellation\
         \ of a payment instruction can be initiated by either the debtor/creditor\
         \ or any subsequent agent in the payment instruction processing chain."
+FIToFIPaymentReversalV09:
+  required:
+    - grpHdr
+  type: object
+  properties:
+    grpHdr:
+      $ref: '#/GroupHeader89'
+    orgnlGrpInf:
+      $ref: '#/OriginalGroupHeader16'
+    txInf:
+      type: array
+      xml:
+        name: TxInf
+      items:
+        $ref: '#/PaymentTransaction111'
+    splmtryData:
+      type: array
+      xml:
+        name: SplmtryData
+      items:
+        $ref: '#/SupplementaryData1'
+  description: "Scope\r\nThe FinancialInstitutionToFinancialInstitutionPaymentReversal message is sent by an agent to the next party in the payment chain. It is used to reverse a payment previously executed.\r\nUsage\r\nThe FIToFIPaymentReversal message is exchanged between agents to reverse a payment message that has been settled. The result will be a credit on the debtor account (when the reversed payment was a direct debit) or a debit on the creditor account (when the reversed payment was a credit transfer).\r\nThe FIToFIPaymentReversal message may or may not be the follow-up of a payment message.\r\nThe FIToFIPaymentReversal message refers to the original payment message by means of references only or by means of references and a set of elements from the original instruction.\r\nThe FIToFIPaymentReversal message can be used in domestic and cross-border scenarios."
 FIToFIPaymentStatusReportV10:
   required:
     - grpHdr
@@ -3206,6 +3815,37 @@ GenericPersonIdentification1:
       xml:
         name: Issr
   description: Information related to an identification of a person.
+GroupHeader78:
+  required:
+    - creDtTm
+    - initgPty
+    - msgId
+    - nbOfTxs
+  type: object
+  properties:
+    msgId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: MsgId
+    creDtTm:
+      type: string
+      format: date-time
+      xml:
+        name: CreDtTm
+    nbOfTxs:
+      pattern: '[0-9]{1,15}'
+      type: string
+      xml:
+        name: NbOfTxs
+    ctrlSum:
+      type: number
+      xml:
+        name: CtrlSum
+    initgPty:
+      $ref: '#/PartyIdentification135'
+  description: Set of characteristics shared by all individual transactions included in the message.
 GroupHeader81:
   required:
     - creDtTm
@@ -3303,6 +3943,89 @@ GroupHeader86:
     cdtrAgt:
       $ref: '#/BranchAndFinancialInstitutionIdentification6'
   description: Provides the characteristics shared by all individual transactions included in the message.
+GroupHeader87:
+  required:
+    - creDtTm
+    - initgPty
+    - msgId
+  type: object
+  properties:
+    msgId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: MsgId
+    creDtTm:
+      type: string
+      format: date-time
+      xml:
+        name: CreDtTm
+    initgPty:
+      $ref: '#/PartyIdentification135'
+    dbtrAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    cdtrAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+  description: Set of characteristics shared by all individual transactions included in the message.
+GroupHeader89:
+  required:
+    - creDtTm
+    - msgId
+    - nbOfTxs
+    - sttlmInf
+  type: object
+  properties:
+    msgId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: MsgId
+    creDtTm:
+      type: string
+      format: date-time
+      xml:
+        name: CreDtTm
+    authstn:
+      maxItems: 2
+      minItems: 0
+      type: array
+      xml:
+        name: Authstn
+      items:
+        $ref: '#/Authorisation1Choice'
+    btchBookg:
+      type: boolean
+      xml:
+        name: BtchBookg
+    nbOfTxs:
+      pattern: '[0-9]{1,15}'
+      type: string
+      xml:
+        name: NbOfTxs
+    ctrlSum:
+      type: number
+      xml:
+        name: CtrlSum
+    grpRvsl:
+      type: boolean
+      xml:
+        name: GrpRvsl
+    ttlRvsdIntrBkSttlmAmt:
+      $ref: '#/ActiveCurrencyAndAmount'
+    intrBkSttlmDt:
+      type: string
+      format: date
+      xml:
+        name: IntrBkSttlmDt
+    sttlmInf:
+      $ref: '#/SettlementInstruction7'
+    instgAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    instdAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+  description: Set of characteristics shared by all individual transactions included in the message.
 GroupHeader90:
   required:
     - creDtTm
@@ -3426,6 +4149,62 @@ GroupHeader93:
       $ref: '#/SettlementInstruction7'
     pmtTpInf:
       $ref: '#/PaymentTypeInformation28'
+    instgAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    instdAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+  description: Set of characteristics shared by all individual transactions included in the message.
+GroupHeader94:
+  required:
+    - creDtTm
+    - msgId
+    - nbOfTxs
+    - sttlmInf
+  type: object
+  properties:
+    msgId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: MsgId
+    creDtTm:
+      type: string
+      format: date-time
+      xml:
+        name: CreDtTm
+    authstn:
+      maxItems: 2
+      minItems: 0
+      type: array
+      xml:
+        name: Authstn
+      items:
+        $ref: '#/Authorisation1Choice'
+    btchBookg:
+      type: boolean
+      xml:
+        name: BtchBookg
+    nbOfTxs:
+      pattern: '[0-9]{1,15}'
+      type: string
+      xml:
+        name: NbOfTxs
+    ctrlSum:
+      type: number
+      xml:
+        name: CtrlSum
+    ttlIntrBkSttlmAmt:
+      $ref: '#/ActiveCurrencyAndAmount'
+    intrBkSttlmDt:
+      type: string
+      format: date
+      xml:
+        name: IntrBkSttlmDt
+    sttlmInf:
+      $ref: '#/SettlementInstruction8'
+    pmtTpInf:
+      $ref: '#/PaymentTypeInformation27'
     instgAgt:
       $ref: '#/BranchAndFinancialInstitutionIdentification6'
     instdAgt:
@@ -3759,6 +4538,58 @@ NameAndAddress16:
     adr:
       $ref: '#/PostalAddress24'
   description: Information that locates and identifies a party.
+NamedNodeMap:
+  type: object
+  properties:
+    namedItem:
+      $ref: '#/Node'
+    namedItemNS:
+      $ref: '#/Node'
+    length:
+      type: integer
+      format: int32
+Node:
+  type: object
+  properties:
+    nodeType:
+      type: integer
+      format: int32
+    nodeName:
+      type: string
+    nodeValue:
+      type: string
+    parentNode:
+      $ref: '#/Node'
+    firstChild:
+      $ref: '#/Node'
+    lastChild:
+      $ref: '#/Node'
+    previousSibling:
+      $ref: '#/Node'
+    nextSibling:
+      $ref: '#/Node'
+    ownerDocument:
+      $ref: '#/Document'
+    baseURI:
+      type: string
+    textContent:
+      type: string
+    namespaceURI:
+      type: string
+    localName:
+      type: string
+    attributes:
+      $ref: '#/NamedNodeMap'
+    childNodes:
+      $ref: '#/NodeList'
+    prefix:
+      type: string
+NodeList:
+  type: object
+  properties:
+    length:
+      type: integer
+      format: int32
 NumberAndSumOfTransactions1:
   type: object
   properties:
@@ -4058,6 +4889,36 @@ OriginalGroupHeader15:
     case:
       $ref: '#/Case5'
   description: Provides details on the original group, to which the message refers.
+OriginalGroupHeader16:
+  required:
+    - orgnlMsgId
+    - orgnlMsgNmId
+  type: object
+  properties:
+    orgnlMsgId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlMsgId
+    orgnlMsgNmId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlMsgNmId
+    orgnlCreDtTm:
+      type: string
+      format: date-time
+      xml:
+        name: OrgnlCreDtTm
+    rvslRsnInf:
+      type: array
+      xml:
+        name: RvslRsnInf
+      items:
+        $ref: '#/PaymentReversalReason9'
+  description: Provides details on the original group, to which the message refers.
 OriginalGroupHeader17:
   required:
     - orgnlMsgId
@@ -4196,6 +5057,57 @@ OriginalGroupInformation29:
       xml:
         name: OrgnlCreDtTm
   description: Unique and unambiguous identifier of the group of transactions as assigned by the original instructing party.
+OriginalGroupInformation30:
+  required:
+    - orgnlMsgId
+    - orgnlMsgNmId
+  type: object
+  properties:
+    orgnlMsgId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlMsgId
+    orgnlMsgNmId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlMsgNmId
+    orgnlCreDtTm:
+      type: string
+      format: date-time
+      xml:
+        name: OrgnlCreDtTm
+    orgnlNbOfTxs:
+      pattern: '[0-9]{1,15}'
+      type: string
+      xml:
+        name: OrgnlNbOfTxs
+    orgnlCtrlSum:
+      type: number
+      xml:
+        name: orgnlCtrlSum
+    grpSts:
+      maxLength: 4
+      minLength: 1
+      type: string
+      xml:
+        name: GrpSts
+    stsRsnInf:
+      type: array
+      xml:
+        name: StsRsnInf
+      items:
+        $ref: '#/StatusReasonInformation12'
+    nbOfTxsPerSts:
+      type: array
+      xml:
+        name: NbOfTxsPerSts
+      items:
+        $ref: '#/NumberOfTransactionsPerStatus5'
+  description: Provides information on the original group, to which the message refers.
 OriginalPaymentInstruction30:
   required:
     - orgnlPmtInfId
@@ -4255,6 +5167,51 @@ OriginalPaymentInstruction30:
       items:
         $ref: '#/PaymentTransaction103'
   description: Provides the details on the reference and status of the original transactions, included in the original instruction, to which the cancellation request message applies.
+OriginalPaymentInstruction31:
+  required:
+    - orgnlPmtInfId
+  type: object
+  properties:
+    orgnlPmtInfId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlPmtInfId
+    orgnlNbOfTxs:
+      pattern: '[0-9]{1,15}'
+      type: string
+      xml:
+        name: OrgnlNbOfTxs
+    orgnlCtrlSum:
+      type: number
+      xml:
+        name: OrgnlCtrlSum
+    pmtInfSts:
+      maxLength: 4
+      minLength: 1
+      type: string
+      xml:
+        name: PmtInfSts
+    stsRsnInf:
+      type: array
+      xml:
+        name: StsRsnInf
+      items:
+        $ref: '#/StatusReasonInformation12'
+    nbOfTxsPerSts:
+      type: array
+      xml:
+        name: NbOfTxsPerSts
+      items:
+        $ref: '#/NumberOfTransactionsPerStatus5'
+    txInfAndSts:
+      type: array
+      xml:
+        name: TxInfAndSts
+      items:
+        $ref: '#/PaymentTransaction104'
+  description: Provides details on the original transactions, to which the status report message refers.
 OriginalPaymentInstruction32:
   required:
     - orgnlPmtInfId
@@ -4362,6 +5319,57 @@ OriginalTransactionReference28:
     purp:
       $ref: '#/Purpose2Choice'
   description: Key elements used to refer the original transaction.
+OriginalTransactionReference29:
+  required:
+    - cdtr
+    - cdtrAgt
+  type: object
+  properties:
+    amt:
+      $ref: '#/AmountType4Choice'
+    reqdExctnDt:
+      $ref: '#/DateAndDateTime2Choice'
+    xpryDt:
+      $ref: '#/DateAndDateTime2Choice'
+    pmtCond:
+      $ref: '#/PaymentCondition1'
+    pmtTpInf:
+      $ref: '#/PaymentTypeInformation26'
+    pmtMtd:
+      type: string
+      description: Specifies the transfer method that will be used to transfer an amount of money.
+      xml:
+        name: PmtMtd
+      enum:
+        - CHK
+        - TRF
+        - DD
+        - TRA
+    rmtInf:
+      $ref: '#/RemittanceInformation16'
+    nclsdFile:
+      type: array
+      xml:
+        name: NclsdFile
+      items:
+        $ref: '#/Document12'
+    ultmtDbtr:
+      $ref: '#/PartyIdentification135'
+    dbtr:
+      $ref: '#/PartyIdentification135'
+    dbtrAcct:
+      $ref: '#/CashAccount38'
+    dbtrAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    cdtrAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    cdtr:
+      $ref: '#/PartyIdentification135'
+    cdtrAcct:
+      $ref: '#/CashAccount38'
+    ultmtCdtr:
+      $ref: '#/PartyIdentification135'
+  description: Key elements used to refer the original transaction.
 OtherContact1:
   required:
     - chanlTp
@@ -4433,6 +5441,19 @@ Pagination1:
       xml:
         name: LastPgInd
   description: Number used to sequence pages when it is not possible for data to be conveyed in a single message and the data has to be split across several pages (messages).
+PartyAndSignature3:
+  required:
+    - pty
+    - sgntr
+  type: object
+  properties:
+    pty:
+      $ref: '#/PartyIdentification135'
+    sgntr:
+      xml:
+        name: Sgntr
+      $ref: '#/SkipPayload'
+      description: Entity involved in an activity.
 PaymentCancellationReason5:
   type: object
   properties:
@@ -4468,6 +5489,51 @@ PaymentCard4:
       xml:
         name: AddtlCardData
   description: Electronic money product that provides the cardholder with a portable and specialised computer device, which typically contains a microprocessor.
+PaymentCondition1:
+  required:
+    - amtModAllwd
+    - earlyPmtAllwd
+    - grntedPmtReqd
+  type: object
+  properties:
+    amtModAllwd:
+      type: boolean
+      xml:
+        name: AmtModAllwd
+    earlyPmtAllwd:
+      type: boolean
+      xml:
+        name: EarlyPmtAllwd
+    delyPnlty:
+      maxLength: 140
+      minLength: 1
+      type: string
+      xml:
+        name: DelyPnlty
+    imdtPmtRbt:
+      $ref: '#/AmountOrRate1Choice'
+    grntedPmtReqd:
+      type: boolean
+      xml:
+        name: GrntedPmtReqd
+  description: Specifies the conditions for the execution of the payment.
+PaymentConditionStatus1:
+  required:
+    - earlyPmt
+    - grntedPmt
+  type: object
+  properties:
+    accptdAmt:
+      $ref: '#/ActiveCurrencyAndAmount'
+    grntedPmt:
+      type: boolean
+      xml:
+        name: GrntedPmt
+    earlyPmt:
+      type: boolean
+      xml:
+        name: EarlyPmt
+  description: Specifies the details on the status of the payment conditions.
 PaymentContext3:
   required:
     - cardDataNtryMd
@@ -4709,6 +5775,64 @@ PaymentInstruction30:
       items:
         $ref: '#/CreditTransferTransaction34'
   description: Characteristics that apply to the debit side of the payment transactions included in the credit transfer initiation.
+PaymentInstruction31:
+  required:
+    - cdtTrfTx
+    - dbtr
+    - dbtrAgt
+    - pmtMtd
+    - reqdExctnDt
+  type: object
+  properties:
+    pmtInfId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: PmtInfId
+    pmtMtd:
+      type: string
+      description: Specifies the transfer method that will be used to transfer the cash.
+      xml:
+        name: PmtMtd
+      enum:
+        - CHK
+        - TRF
+    pmtTpInf:
+      $ref: '#/PaymentTypeInformation26'
+    reqdExctnDt:
+      $ref: '#/DateAndDateTime2Choice'
+    xpryDt:
+      $ref: '#/DateAndDateTime2Choice'
+    pmtCond:
+      $ref: '#/PaymentCondition1'
+    dbtr:
+      $ref: '#/PartyIdentification135'
+    dbtrAcct:
+      $ref: '#/CashAccount38'
+    dbtrAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    ultmtDbtr:
+      $ref: '#/PartyIdentification135'
+    chrgBr:
+      type: string
+      description: Specifies which party(ies) will pay charges due for processing of the instruction.
+      xml:
+        name: ChrgBr
+      enum:
+        - DEBT
+        - CRED
+        - SHAR
+        - SLEV
+    cdtTrfTx:
+      maxItems: 2147483647
+      minItems: 1
+      type: array
+      xml:
+        name: CdtTrfTxInf
+      items:
+        $ref: '#/CreditTransferTransaction35'
+  description: Instruction to pay an amount of money to an ultimate beneficiary, on behalf of an originator. This instruction may have to be forwarded several times to complete the settlement chain.
 PaymentReturnV09:
   required:
     - grpHdr
@@ -4780,6 +5904,20 @@ PaymentReturnReason6:
         xml:
           name: AddtlInf
   description: Provides further details on the reason of the return of the transaction.
+PaymentReversalReason9:
+  type: object
+  properties:
+    orgtr:
+      $ref: '#/PartyIdentification135'
+    rsn:
+      $ref: '#/ReversalReason4Choice'
+    addtlInf:
+      type: array
+      xml:
+        name: AddtlInf
+      items:
+        type: string
+  description: Provides further details on the reason of the reversal of the transaction.
 PaymentTransaction102:
   type: object
   properties:
@@ -4908,6 +6046,89 @@ PaymentTransaction103:
     orgnlTxRef:
       $ref: '#/OriginalTransactionReference28'
   description: Provides reference and status information on the original transactions, included in the original instruction, to which the cancellation request message applies.
+PaymentTransaction104:
+  type: object
+  properties:
+    stsId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: StsId
+    orgnlInstrId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlInstrId
+    orgnlEndToEndId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlEndToEndId
+    orgnlUETR:
+      pattern: '[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}'
+      type: string
+      xml:
+        name: OrgnlUETR
+    txSts:
+      maxLength: 4
+      minLength: 1
+      type: string
+      xml:
+        name: TxSts
+    stsRsnInf:
+      type: array
+      xml:
+        name: StsRsnInf
+      items:
+        $ref: '#/StatusReasonInformation12'
+    pmtCondSts:
+      $ref: '#/PaymentConditionStatus1'
+    chrgsInf:
+      type: array
+      xml:
+        name: ChrgsInf
+      items:
+        $ref: '#/Charges7'
+    dbtrDcsnDtTm:
+      type: string
+      format: date
+      xml:
+        name: DbtrDcsnDtTm
+    accptncDtTm:
+      type: string
+      format: date
+      xml:
+        name: AccptncDtTm
+    acctSvcrRef:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: AcctSvcrRef
+    clrSysRef:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: ClrSysRef
+    orgnlTxRef:
+      $ref: '#/OriginalTransactionReference29'
+    nclsdFile:
+      type: array
+      xml:
+        name: NclsdFile
+      items:
+        $ref: '#/Document12'
+    splmtryData:
+      type: array
+      xml:
+        name: SplmtryData
+      items:
+        $ref: '#/SupplementaryData1'
+  description: Provides further details on the original transactions, to which the status report message refers.
 PaymentTransaction105:
   type: object
   properties:
@@ -5206,6 +6427,111 @@ PaymentTransaction110:
       items:
         $ref: '#/SupplementaryData1'
   description: Provides further details on the original transactions, to which the status report message refers.
+PaymentTransaction111:
+  required:
+    - rvsdIntrBkSttlmAmt
+  type: object
+  properties:
+    rvslId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: RvslId
+    orgnlGrpInf:
+      $ref: '#/OriginalGroupInformation29'
+    orgnlInstrId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlInstrId
+    orgnlEndToEndId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlEndToEndId
+    orgnlTxId:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlTxId
+    orgnlUETR:
+      pattern: '[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}'
+      type: string
+      xml:
+        name: OrgnlUETR
+    orgnlClrSysRef:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: OrgnlClrSysRef
+    orgnlIntrBkSttlmAmt:
+      $ref: '#/ActiveOrHistoricCurrencyAndAmount'
+    rvsdIntrBkSttlmAmt:
+      $ref: '#/ActiveCurrencyAndAmount'
+    intrBkSttlmDt:
+      type: string
+      format: date
+      xml:
+        name: IntrBkSttlmDt
+    sttlmPrty:
+      type: string
+      description: Specifies the priority level of an event.
+      xml:
+        name: SttlmPrty
+      enum:
+        - URGT
+        - HIGH
+        - NORM
+    sttlmTmIndctn:
+      $ref: '#/SettlementDateTimeIndication1'
+    rvsdInstdAmt:
+      $ref: '#/ActiveOrHistoricCurrencyAndAmount'
+    xchgRate:
+      type: number
+      xml:
+        name: XchgRate
+    compstnAmt:
+      $ref: '#/ActiveOrHistoricCurrencyAndAmount'
+    chrgBr:
+      type: string
+      description: Specifies which party(ies) will pay charges due for processing of the instruction.
+      xml:
+        name: ChrgBr
+      enum:
+        - DEBT
+        - CRED
+        - SHAR
+        - SLEV
+    chrgsInf:
+      type: array
+      xml:
+        name: ChrgsInf
+      items:
+        $ref: '#/Charges7'
+    instgAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    instdAgt:
+      $ref: '#/BranchAndFinancialInstitutionIdentification6'
+    rvslRsnInf:
+      type: array
+      xml:
+        name: RvslRsnInf
+      items:
+        $ref: '#/PaymentReversalReason9'
+    orgnlTxRef:
+      $ref: '#/OriginalTransactionReference28'
+    splmtryData:
+      type: array
+      xml:
+        name: SplmtryData
+      items:
+        $ref: '#/SupplementaryData1'
+  description: Provides further details on the reference and status on the original transactions, included in the original instruction, to which the reversal message applies.
 PaymentTransaction112:
   required:
     - rtrdIntrBkSttlmAmt
@@ -6732,6 +8058,22 @@ ReturnReason5Choice:
       xml:
         name: Prtry
   description: Specifies the reason for the return of the transaction.
+ReversalReason4Choice:
+  type: object
+  properties:
+    cd:
+      maxLength: 4
+      minLength: 1
+      type: string
+      xml:
+        name: Cd
+    prtry:
+      maxLength: 35
+      minLength: 1
+      type: string
+      xml:
+        name: Prtry
+  description: Specifies the reason for the reversal of the transaction.
 SecuritiesAccount19:
   required:
     - id
@@ -6773,6 +8115,25 @@ SecurityIdentification19:
       xml:
         name: Desc
   description: Identification of a security.
+SettlementInstruction8:
+  required:
+    - sttlmMtd
+  type: object
+  properties:
+    sttlmMtd:
+      type: string
+      description: Specifies the method used to settle the credit transfer instruction.
+      xml:
+        name: SttlmMtd
+      enum:
+        - INDA
+        - INGA
+        - CLRG
+    sttlmAcct:
+      $ref: '#/CashAccount38'
+    clrSys:
+      $ref: '#/ClearingSystemIdentification3Choice'
+  description: Provides further details on the settlement of the instruction.
 SequenceRange1:
   required:
     - frSeq
@@ -6930,6 +8291,12 @@ SettlementTimeRequest2:
       xml:
         name: CLSTm
   description: Provides information on the requested settlement time(s) of the payment instruction.
+SkipPayload:
+  type: object
+  properties:
+    any:
+      $ref: '#/Element'
+  description: "Specifies a data structure that allows to include any valid XML Structure (e.g. through an XML Schema). The property namespace is set to 'any'.\r\nThe processContents value is 'skip' which according to the above specification and to Iso20022: 2013 means that the application will not perform further validation processing."
 StatementResolutionEntry4:
   type: object
   properties:
@@ -8038,6 +9405,13 @@ TransactionParties7:
     ultmtCdtr:
       $ref: '#/Party40Choice'
   description: Provides further details on the parties specific to the individual transaction.
+TypeInfo:
+  type: object
+  properties:
+    typeNamespace:
+      type: string
+    typeName:
+      type: string
 UnderlyingGroupInformation1:
   required:
     - orgnlMsgId
