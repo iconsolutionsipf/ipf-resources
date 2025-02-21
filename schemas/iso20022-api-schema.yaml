@@ -2306,6 +2306,83 @@ CustomerCreditTransferInitiationV09:
         \ used in domestic and cross-border scenarios.\r\nThe CustomerCreditTransferInitiation\
         \ message must not be used by the debtor agent to execute the credit transfer\
         \ instruction(s). The FIToFICustomerCreditTransfer message must be used instead."
+CustomerPaymentCancellationRequestV08:
+  required:
+    - assgnmt
+    - undrlyg
+  type: object
+  properties:
+    assgnmt:
+      $ref: "#/CaseAssignment5"
+    get_case:
+      $ref: "#/Case5"
+    ctrlData:
+      $ref: "#/ControlData1"
+    undrlyg:
+      type: array
+      items:
+        $ref: "#/UnderlyingTransaction24"
+    splmtryData:
+      type: array
+      items:
+        $ref: "#/SupplementaryData1"
+    case:
+      $ref: "#/Case5"
+  description: "Scope\r\nThe CustomerPaymentCancellationRequest message is sent\
+        \ by a case creator/case assigner to a case assignee.\r\nThis message is used\
+        \ to request the cancellation of an original payment instruction. The CustomerPaymentCancellationRequest\
+        \ message is issued by the initiating party to request the cancellation of\
+        \ an initiation payment message previously sent (such as CustomerCreditTransferInitiation\
+        \ or CustomerDirectDebitInitiation).\r\nUsage\r\nThe CustomerPaymentCancellationRequest\
+        \ message must be answered with a:\r\n- ResolutionOfInvestigation message\
+        \ with a positive final outcome when the case assignee can perform the requested\
+        \ cancellation;\r\n- ResolutionOfInvestigation message with a negative final\
+        \ outcome when the case assignee may perform the requested cancellation but\
+        \ fails to do so (too late, irrevocable instruction);\r\n- RejectInvestigation\
+        \ message when the case assignee is unable or not authorised to perform the\
+        \ requested cancellation;\r\n- NotificationOfCaseAssignment message to indicate\
+        \ whether the case assignee will take on the case himself or reassign the\
+        \ case to a subsequent party in the payment processing chain.\r\nA CustomerPaymentCancellationRequest\
+        \ message concerns one and only one original payment instruction at a time.\r\
+        \nWhen a case assignee successfully performs a cancellation, it must return\
+        \ the corresponding funds to the case assigner. It may provide some details\
+        \ about the return in the ResolutionOfInvestigation message.\r\nThe processing\
+        \ of a CustomerPaymentCancellationRequest message case may lead to a DebitAuthorisationRequest\
+        \ message sent to the creditor by its account servicing institution.\r\nThe\
+        \ CustomerPaymentCancellationRequest message may be used to escalate a case\
+        \ after an unsuccessful request to modify the payment. In this scenario, the\
+        \ case identification remains the same as in the original CustomerPaymentCancellationRequest\
+        \ message and the element ReopenCaseIndication is set to 'Yes' or 'true'.\r\
+        \nThe CustomerPaymentCancellationRequest message has the following main characteristics:\
+        \ the case creator assigns a unique case identification and the reason code\
+        \ for the cancellation request. This information will be passed unchanged\
+        \ to all subsequent case assignee(s). \r\nFor the CustomerPaymentCancellationRequest\
+        \ message the case has been made optional, as the message might be used outside\
+        \ of a case management environment where the case identification is not relevant.\r\
+        \nMoreover, the case identification may be present at different levels:\r\n\
+        - One unique case is defined per cancellation request message: If multiple\
+        \ underlying groups, payment information blocks or transactions are present\
+        \ in the message and the case assignee has already forwarded the transaction\
+        \ for which the cancellation is requested, the case cannot be forwarded to\
+        \ the next party in the chain (see rule on uniqueness of the case) and the\
+        \ case creator will have to issue individual cancellation requests for each\
+        \ underlying individual transaction. In response to this cancellation request,\
+        \ the case must also be present at the message level in the Resolution of\
+        \ Investigation message;\r\n- One case per original group, payment information\
+        \ or transaction present in the cancellation request: For each group, payment\
+        \ information block or transaction within the payment information, a unique\
+        \ case has been assigned. This means, when a payment instruction has already\
+        \ been forwarded by the case assignee, the cancellation request may be forwarded\
+        \ to next party in the payment chain, with the unique case assigned to the\
+        \ transaction. When the group can only be cancelled partially, new cancellation\
+        \ requests need however to be issued for the individual transactions within\
+        \ the group for which the cancellation request has not been successful. In\
+        \ response to this cancellation request, the case must be present in the cancellation\
+        \ details identifying the original group or transaction in the Resolution\
+        \ of Investigation message;\r\n- No case used in cancellation request message:\
+        \ The cancellation of a payment instruction can be initiated by either the\
+        \ debtor/creditor or any subsequent agent in the payment instruction processing\
+        \ chain."
 CustomerPaymentStatusReportV10:
   required:
     - grpHdr
@@ -5257,6 +5334,43 @@ OriginalPaymentInstruction32:
       items:
         $ref: '#/PaymentTransaction105'
   description: Provides details information on the original transactions, to which the status report message refers.
+OriginalPaymentInstruction34:
+  required:
+    - orgnlPmtInfId
+  type: object
+  properties:
+    pmtCxlId:
+      type: string
+      maxLength: 35
+      minLength: 1
+    get_case:
+      $ref: "#/Case5"
+    orgnlPmtInfId:
+      type: string
+      maxLength: 35
+      minLength: 1
+    orgnlGrpInf:
+      $ref: "#/OriginalGroupInformation29"
+    nbOfTxs:
+      type: string
+      pattern: "[0-9]{1,15}"
+    ctrlSum:
+      type: number
+    pmtInfCxl:
+      type: boolean
+    cxlRsnInf:
+      type: array
+      items:
+        $ref: "#/PaymentCancellationReason5"
+    txInf:
+      type: array
+      items:
+        $ref: "#/PaymentTransaction109"
+    case:
+      $ref: "#/Case5"
+  description: "Provides details on the reference and status of the original transactions,\
+    \ included in the original instruction, to which the cancellation request\
+    \ message applies."
 OriginalTransactionReference28:
   type: object
   properties:
@@ -6343,6 +6457,48 @@ PaymentTransaction107:
     orgnlTxRef:
       $ref: '#/OriginalTransactionReference28'
   description: Provides further details on the reference and status on the original transactions, included in the original instruction, to which the cancellation request message applies.
+PaymentTransaction109:
+  type: object
+  properties:
+    cxlId:
+      type: string
+      maxLength: 35
+      minLength: 1
+    get_case:
+      $ref: "#/Case5"
+    orgnlInstrId:
+      type: string
+      maxLength: 35
+      minLength: 1
+    orgnlEndToEndId:
+      type: string
+      maxLength: 35
+      minLength: 1
+    orgnlUETR:
+      type: string
+      pattern: "[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}"
+    orgnlInstdAmt:
+      $ref: "#/ActiveOrHistoricCurrencyAndAmount"
+    orgnlReqdExctnDt:
+      $ref: "#/DateAndDateTime2Choice"
+    orgnlReqdColltnDt:
+      type: string
+      format: date
+    cxlRsnInf:
+      type: array
+      items:
+        $ref: "#/PaymentCancellationReason5"
+    orgnlTxRef:
+      $ref: "#/OriginalTransactionReference28"
+    splmtryData:
+      type: array
+      items:
+        $ref: "#/SupplementaryData1"
+    case:
+      $ref: "#/Case5"
+  description: "Provides reference and status information on the original transactions,\
+    \ included in the original instruction, to which the cancellation request\
+    \ message applies."
 PaymentTransaction110:
   type: object
   properties:
@@ -9588,6 +9744,16 @@ UnderlyingTransaction23:
       items:
         $ref: '#/PaymentTransaction106'
   description: Identifies the underlying (group of) transaction(s) to which the investigation applies.
+UnderlyingTransaction24:
+  type: object
+  properties:
+    orgnlGrpInfAndCxl:
+      $ref: "#/OriginalGroupHeader15"
+    orgnlPmtInfAndCxl:
+      type: array
+      items:
+        $ref: "#/OriginalPaymentInstruction34"
+  description: Identifies the underlying (group of) transaction(s) to which theinvestigation applies.
 YieldedOrValueType1Choice:
   type: object
   properties:
